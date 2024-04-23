@@ -59,11 +59,11 @@ describe('GatewayPoC Test', function () {
         await mockEndpointV2A.setDestLzEndpoint(gatewayTwo.address, mockEndpointV2B.address)
         await mockEndpointV2B.setDestLzEndpoint(gatewayOne.address, mockEndpointV2A.address)
 
-        // Setting each MyOApp instance as a peer of the other
+        // Setting each Gateway instance as a peer of the other
         await gatewayOne.connect(ownerOne).setPeer(eidB, ethers.utils.zeroPad(gatewayTwo.address, 32))
         await gatewayTwo.connect(ownerTwo).setPeer(eidA, ethers.utils.zeroPad(gatewayOne.address, 32))
 
-        // Fund Gateway Two with some native token
+        // Fund Gateway Two with some native token to cover the callback message sending fee
         await ownerOne.sendTransaction({ to: gatewayTwo.address, value: ethers.utils.parseEther('1') })
     })
 
