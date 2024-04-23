@@ -5,8 +5,11 @@ pragma solidity ^0.8.22;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OApp.sol";
 import { MessagingReceipt } from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAppSender.sol";
+import { OptionsBuilder } from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OptionsBuilder.sol";
 
 contract GatewayTwo is OApp {
+    using OptionsBuilder for bytes;
+
     constructor(address _endpoint, address _delegate) OApp(_endpoint, _delegate) Ownable(_delegate) {}
 
     string public data = "Nothing received yet.";
@@ -51,7 +54,7 @@ contract GatewayTwo is OApp {
         data = abi.decode(payload, (string));
 
         uint32 dstEid = _origin.srcEid;
-        bytes memory options;
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
         MessagingFee memory fee = quote(dstEid, abi.decode(payload, (string)), options, false);
         _lzSend(dstEid, payload, options, fee, payable(msg.sender));
     }

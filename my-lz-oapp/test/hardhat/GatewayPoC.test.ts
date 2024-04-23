@@ -51,7 +51,7 @@ describe('GatewayPoC Test', function () {
         mockEndpointV2A = await EndpointV2Mock.deploy(eidA)
         mockEndpointV2B = await EndpointV2Mock.deploy(eidB)
 
-        // Deploying two instances of MyOApp contract and linking them to the mock LZEndpoint
+        // Deploying two instances of the Gateway contracts and linking them to the mock LZEndpoint
         gatewayOne = await GatewayOneFactory.deploy(mockEndpointV2A.address, ownerOne.address)
         gatewayTwo = await GatewayTwoFactory.deploy(mockEndpointV2B.address, ownerTwo.address)
 
@@ -83,9 +83,6 @@ describe('GatewayPoC Test', function () {
 
         // Assert the resulting state of data Gateway Two
         expect(await gatewayTwo.data()).to.equal('Test message.', "Gateway Two didn't receive the message.")
-
-        // wait 30 seconds
-        await new Promise((resolve) => setTimeout(resolve, 30000))
 
         // Assert the resulting state after the callback to Gateway One
         expect(await gatewayOne.data()).to.equal('Test message.', "Gateway One didn't receive the message back.")
