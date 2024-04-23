@@ -15,6 +15,23 @@ contract GatewayTwo is OApp {
     string public data = "Nothing received yet.";
 
     /**
+     * @notice Sends a message from the source chain to a destination chain.
+     * @param _dstEid The endpoint ID of the destination chain.
+     * @param _message The message string to be sent.
+     * @param _options Additional options for message execution.
+     * @dev Encodes the message as bytes and sends it using the `_lzSend` internal function.
+     * @return receipt A `MessagingReceipt` struct containing details of the message sent.
+     */
+    function send(
+        uint32 _dstEid,
+        string memory _message,
+        bytes calldata _options
+    ) public payable returns (MessagingReceipt memory receipt) {
+        bytes memory _payload = abi.encode(_message);
+        receipt = _lzSend(_dstEid, _payload, _options, MessagingFee(msg.value, 0), payable(msg.sender));
+    }
+
+    /**
      * @notice Quotes the gas needed to pay for the full omnichain transaction in native gas or ZRO token.
      * @param _dstEid Destination chain's endpoint ID.
      * @param _message The message.
@@ -56,7 +73,8 @@ contract GatewayTwo is OApp {
         uint32 dstEid = _origin.srcEid;
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
         MessagingFee memory fee = quote(dstEid, abi.decode(payload, (string)), options, false);
-        _lzSend(dstEid, payload, options, fee, payable(msg.sender));
+        // call the _lzSend as a external funciton to set a msg.value
+        this.send{ value: fee.nativeFee }(dstEid, data, options);
     }
 
     receive() external payable {}
