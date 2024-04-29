@@ -1,6 +1,13 @@
 {
   "exclude": ["node_modules"],
-  "include": ["deploy", "test", "tasks", "hardhat.config.ts"],
+  "include": [
+    "deploy",
+    "test",
+    "tasks",
+    "scripts",
+    "hardhat.config.ts",
+    "scripts/SetUpGatewayOne.ts"
+  ],
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",

@@ -62,9 +62,6 @@ describe('GatewayPoC Test', function () {
         // Setting each Gateway instance as a peer of the other
         await gatewayOne.connect(ownerOne).setPeer(eidB, ethers.utils.zeroPad(gatewayTwo.address, 32))
         await gatewayTwo.connect(ownerTwo).setPeer(eidA, ethers.utils.zeroPad(gatewayOne.address, 32))
-
-        // Fund Gateway Two with some native token to cover the callback message sending fee
-        await ownerOne.sendTransaction({ to: gatewayTwo.address, value: ethers.utils.parseEther('1') })
     })
 
     // A test case to verify message sending functionality
@@ -72,7 +69,12 @@ describe('GatewayPoC Test', function () {
         // Assert initial state of data in Gateway One
         expect(await gatewayOne.data()).to.equal('Nothing received yet.')
         expect(await gatewayTwo.data()).to.equal('Nothing received yet.')
-        const options = Options.newOptions().addExecutorLzReceiveOption(200000, 0).toHex().toString()
+
+        // Set up options for the message send operation
+        const callbakcOptions = Options.newOptions().addExecutorLzReceiveOption(200000, 0).toHex().toString()
+        const nativeDrop = (await gatewayTwo.quote(eidA, 'Test message.', callbakcOptions, false)).nativeFee
+
+        const options = Options.newOptions().addExecutorLzReceiveOption(200000, nativeDrop).toHex().toString()
 
         // Define native fee and quote for the message send operation
         let nativeFee = 0
